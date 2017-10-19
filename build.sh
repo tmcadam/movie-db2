@@ -13,19 +13,22 @@ else
 fi
 
 # Enter virtualenv
+echo "**> activating virtual environment"
 set +u
-source .env/bin/activate
+source .env/bin/activate > /dev/null
 set -u
 
-# Install the Flask app
 # Install dependencies
-pip install -U pip-tools
-pip install -U setuptools
+echo "**> installing dependencies"
+pip install -U pip-tools > /dev/null
+pip install -U setuptools > /dev/null
 pip-compile -o requirements.txt requirements.in > /dev/null
 pip-compile -o requirements-dev.txt requirements-dev.in > /dev/null
-pip-sync requirements.txt requirements-dev.txt
+pip-sync requirements.txt requirements-dev.txt > /dev/null
 
 # Run tests
+echo "**> running tests"
 nosetests
 
-echo "Build complete"
+echo "**> build complete"
+
