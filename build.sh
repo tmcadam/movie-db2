@@ -17,6 +17,7 @@ set +u
 source .env/bin/activate
 set -u
 
+# Install the Flask app
 # Install dependencies
 pip install -U pip-tools
 pip install -U setuptools
@@ -25,3 +26,6 @@ pip-compile -o requirements-dev.txt requirements-dev.in > /dev/null
 pip-sync requirements.txt requirements-dev.txt
 
 # Run tests
+bash test.sh
+
+echo "Build complete"
