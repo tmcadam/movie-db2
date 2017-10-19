@@ -26,6 +26,6 @@ pip-compile -o requirements-dev.txt requirements-dev.in > /dev/null
 pip-sync requirements.txt requirements-dev.txt
 
 # Run tests
-bash test.sh
+nosetests
 
 echo "Build complete"

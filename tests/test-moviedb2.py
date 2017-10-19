@@ -11,6 +11,3 @@ class Moviedb2TestCase(unittest.TestCase):
         rv = self.app.get('/')
         assert rv.status_code == 200
         assert b'Hello, World!' in rv.data
-
-if __name__ == '__main__':
-    unittest.main()
