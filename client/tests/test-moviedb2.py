@@ -11,6 +11,15 @@ POST_SERVER_URL = "http://someurl.com/api/v1/file_names"
 
 class Moviedb2TestCase(unittest.TestCase):
 
+    def test_monitor__folder_responds_to_new_file_in_folder(self):
+        with requests_mock.mock() as m:
+            m.post(POST_SERVER_URL, status_code=200)
+            Path(os.path.join(self.test_folder, "blah.avi")).touch()
+            assert_equals(moviedb2.monitor_folder(self.test_folder), 2)
+        self.tearDown()
+        os.mkdir(self.test_folder)
+        assert_equals(moviedb2.monitor_folder(self.test_folder), 0)
+
     def test_send_filename_returns_true_if_successful(self):
         with requests_mock.mock() as m:
             m.post(POST_SERVER_URL, status_code=200)
@@ -38,7 +47,7 @@ class Moviedb2TestCase(unittest.TestCase):
         assert_equals(len(files), 3)
 
     def test_get_files_returns_none_if_empty(self):
-        shutil.rmtree(self.test_folder)
+        self.tearDown()
         os.mkdir(self.test_folder)
         assert not moviedb2.get_files(self.test_folder)
 
