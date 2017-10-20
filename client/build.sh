@@ -28,7 +28,6 @@ pip-sync requirements.txt requirements-dev.txt > /dev/null
 
 # Run tests
 echo "**> running tests"
-export PYTHONPATH=${PYTHONPATH}:${PROJECT_DIR}/moviedb2
 nosetests
 
 echo "**> build complete"
