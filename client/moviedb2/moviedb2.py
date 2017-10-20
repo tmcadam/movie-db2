@@ -5,6 +5,7 @@ import time
 
 POST_SERVER_URL = "http://someurl.com"
 PATH = "/home/tmcadam/Tools/movie-db2/client/tests/movies_folder"
+FILE_EXTS = [".avi", ".mp4", ".mkv"]
 
 def send_filename_to_server ( filename ):
     r = requests.post(POST_SERVER_URL, json={"file_name": filename})
@@ -16,7 +17,6 @@ def get_files_without_id( files ):
     return [ f for f in files if not re.search('\{tt\d{7}\}', f) ]
 
 def get_files ( path ):
-    FILE_EXTS = [".avi", ".mp4", ".mkv"]
     return [os.path.join(root, name)
             for root, dirs, files in os.walk(path)
             for name in files
