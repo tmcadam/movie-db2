@@ -35,3 +35,10 @@ def monitor_folder ( path ):
             if send_filename_to_server(filename):
                 status += 1
     return status
+
+print ("Watching folder: {}".format(PATH))
+while 1:
+  time.sleep (10)
+  status = monitor_folder ( PATH )
+  if status > 0:
+      print("New files: {}".format(status), end='\r')
