@@ -22,7 +22,7 @@ def add_new_movie( filename ):
     MOVIE_DATA[filename] = {"status": "found"}
 
 def is_movie_sent( filename ):
-    return MOVIE_DATA[filename]["status"] == "sent"
+    return not is_new_movie(filename) and MOVIE_DATA[filename]["status"] == "sent"
 
 def is_new_movie( filename ):
     return filename not in MOVIE_DATA
@@ -67,22 +67,17 @@ def check_folder_exists ( path ):
     return os.path.exists(path) and os.path.isdir(path)
 
 def monitor_folder ( path, movie_data_path ):
-    folder_stats = {"sent":0, "count":0, "found":0}
     if not check_folder_exists( path ):
         return None
     load_movie_data (movie_data_path)
     files = get_files_without_id( get_files( path ) )
-    if files:
-        for filename in files:
-            folder_stats["count"] += 1
-            send = False
+    folder_stats = {"sent":0, "found":0, "count":len(files)}
+    for filename in files:
+        if not is_movie_sent ( filename ):
             if is_new_movie ( filename ):
                 folder_stats["found"] += 1
                 add_new_movie ( filename )
-                send = True
-            elif not is_new_movie ( filename ) and not is_movie_sent ( filename ):
-                send = True
-            if send and send_filename_to_server( filename ):
+            if send_filename_to_server( filename ):
                 set_movie_sent( filename )
                 folder_stats["sent"] += 1
     write_movie_data (movie_data_path)
