@@ -1,0 +1,3 @@
+POST_SERVER_URL: http://test-url.com
+PATH: /test path/movies/
+FILE_EXTS: [".avi", ".mp4", ".mkv"]

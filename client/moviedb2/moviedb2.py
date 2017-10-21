@@ -1,17 +1,30 @@
-import requests
 import os
 import re
-import time
+import urllib3
+import yaml
 
-POST_SERVER_URL = "http://someurl.com"
-PATH = "/home/tmcadam/Tools/movie-db2/client/tests/movies_folder"
-FILE_EXTS = [".avi", ".mp4", ".mkv"]
+import requests
+
+CONFIG = None
+
+def load_config ( filename ):
+    with open(filename, 'r') as f:
+        try:
+            global CONFIG
+            CONFIG = yaml.load(f)
+        except yaml.YAMLError as exc:
+            # write something to logs
+            return False
+    return True
 
 def send_filename_to_server ( filename ):
-    r = requests.post(POST_SERVER_URL, json={"file_name": filename})
-    if r.status_code == 200:
-        return True
-    return False
+    try:
+        r = requests.post(CONFIG["POST_SERVER_URL"], json={"file_name": filename})
+        if r.status_code == 200:
+            return True
+        return False
+    except (ConnectionRefusedError, requests.exceptions.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.NewConnectionError) :
+        return False
 
 def get_files_without_id( files ):
     return [ f for f in files if not re.search('\{tt\d{7}\}', f) ]
@@ -20,7 +33,7 @@ def get_files ( path ):
     return [os.path.join(root, name)
             for root, dirs, files in os.walk(path)
             for name in files
-            if os.path.splitext(name)[1] in FILE_EXTS]
+            if os.path.splitext(name)[1] in CONFIG["FILE_EXTS"]]
 
 def check_folder_exists ( path ):
     return os.path.exists(path) and os.path.isdir(path)
@@ -35,10 +48,3 @@ def monitor_folder ( path ):
             if send_filename_to_server(filename):
                 status += 1
     return status
-
-print ("Watching folder: {}".format(PATH))
-while 1:
-  time.sleep (10)
-  status = monitor_folder ( PATH )
-  if status > 0:
-      print("New files: {}".format(status), end='\r')

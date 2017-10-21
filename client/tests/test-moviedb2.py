@@ -7,9 +7,16 @@ import requests_mock
 
 from moviedb2 import moviedb2
 
-POST_SERVER_URL = "http://someurl.com/api/v1/file_names"
+POST_SERVER_URL = "http://localhost:5000/moviesdb2/api/v1.0/filenames"
 
 class Moviedb2TestCase(unittest.TestCase):
+
+    def test_can_read_variables_from_config(self):
+        assert moviedb2.load_config ( os.path.join("tests", "data", "test-config.yml") )
+        config = moviedb2.CONFIG
+        assert "PATH" in config and config["PATH"] == "/test path/movies/"
+        assert "POST_SERVER_URL" in config and config["POST_SERVER_URL"] == "http://test-url.com"
+        assert "FILE_EXTS" in config and len(config["FILE_EXTS"]) == 3 and config["FILE_EXTS"][0] == ".avi"
 
     def test_monitor__folder_responds_to_new_file_in_folder(self):
         with requests_mock.mock() as m:
@@ -64,7 +71,8 @@ class Moviedb2TestCase(unittest.TestCase):
         assert not moviedb2.check_folder_exists(self.test_folder)
 
     def setUp(self):
-        self.test_folder = os.path.join("tests", "test_movies")
+        moviedb2.load_config ( "config.yml" )
+        self.test_folder = os.path.join("tests", "data" "test_movies")
         self.files = [os.path.join(self.test_folder, "test1 {tt1234567}.avi"),
                         os.path.join(self.test_folder, "A", "test2 {tt2345678}.mp4"),
                         os.path.join(self.test_folder, "B", "test3.mkv")]
@@ -80,3 +88,6 @@ class Moviedb2TestCase(unittest.TestCase):
                 shutil.rmtree(self.test_folder)
             else:
                 os.remove(self.test_folder)
+
+if __name__ == '__main__':
+    unittest.main()
