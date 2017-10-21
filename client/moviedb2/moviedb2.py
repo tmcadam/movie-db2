@@ -2,17 +2,45 @@ import os
 import re
 import urllib3
 import yaml
+import json
 
 import requests
 
 CONFIG = None
+MOVIE_DATA = None
+
+def write_movie_data( filename ):
+    with open(filename, 'w') as f:
+        json.dump(MOVIE_DATA, f)
+
+def set_movie_sent( filename ):
+    global MOVIE_DATA
+    MOVIE_DATA[filename]["status"] = "sent"
+
+def add_new_movie( filename ):
+    global MOVIE_DATA
+    MOVIE_DATA[filename] = {"status": "found"}
+
+def is_movie_sent( filename ):
+    return MOVIE_DATA[filename]["status"] == "sent"
+
+def is_new_movie( filename ):
+    return filename not in MOVIE_DATA
+
+def load_movie_data ( filename ):
+    global MOVIE_DATA
+    try:
+        with open(filename, 'r') as f:
+            MOVIE_DATA = json.load(f)
+    except FileNotFoundError as e:
+        MOVIE_DATA = dict()
 
 def load_config ( filename ):
     with open(filename, 'r') as f:
         try:
             global CONFIG
             CONFIG = yaml.load(f)
-        except yaml.YAMLError as exc:
+        except yaml.YAMLError as e:
             # write something to logs
             return False
     return True
@@ -38,13 +66,24 @@ def get_files ( path ):
 def check_folder_exists ( path ):
     return os.path.exists(path) and os.path.isdir(path)
 
-def monitor_folder ( path ):
-    status = 0
+def monitor_folder ( path, movie_data_path ):
+    folder_stats = {"sent":0, "count":0, "found":0}
     if not check_folder_exists( path ):
-        return 0
+        return None
+    load_movie_data (movie_data_path)
     files = get_files_without_id( get_files( path ) )
     if files:
         for filename in files:
-            if send_filename_to_server(filename):
-                status += 1
-    return status
+            folder_stats["count"] += 1
+            send = False
+            if is_new_movie ( filename ):
+                folder_stats["found"] += 1
+                add_new_movie ( filename )
+                send = True
+            elif not is_new_movie ( filename ) and not is_movie_sent ( filename ):
+                send = True
+            if send and send_filename_to_server( filename ):
+                set_movie_sent( filename )
+                folder_stats["sent"] += 1
+    write_movie_data (movie_data_path)
+    return folder_stats

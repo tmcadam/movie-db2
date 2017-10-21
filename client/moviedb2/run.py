@@ -6,7 +6,9 @@ if not moviedb2.load_config ( "config.yml" ):
 
 print ("Watching folder: {}".format ( moviedb2.CONFIG["PATH"] ))
 while 1:
-  status = moviedb2.monitor_folder ( moviedb2.CONFIG["PATH"] )
-  if status > 0:
-      print("New files: {}".format(status), end='\r')
+  folder_stats = moviedb2.monitor_folder ( moviedb2.CONFIG["PATH"], moviedb2.CONFIG["DATA_PATH"] )
+  if folder_stats:
+      print("Count: {}    Found: {}    Sent: {}".format(folder_stats["count"], folder_stats["found"], folder_stats["sent"]), end='\r')
+  else:
+      print("Error", end='\r')
   time.sleep (10)

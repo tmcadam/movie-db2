@@ -2,3 +2,5 @@
 __pycache__/
 .idea/
 client/tests/movies_folder/
+config.yml
+movie_data.json
