@@ -115,7 +115,7 @@ class Moviedb2TestCase(unittest.TestCase):
     def test_send_filename_returns_false_if_unsuccessful(self):
         with requests_mock.mock() as m:
             m.post(POST_SERVER_URL, status_code=403)
-            assert not moviedb2.send_filename_to_server('some_file_name')
+            assert not moviedb2.send_filename_to_server('some_file_name')[0]
 
     def test_get_files_without_id_returns_subset_of_files(self):
         Path(os.path.join(self.test_folder, "blah {1980}.avi")).touch() # this one has an invalid IMDB id + 1 in the setUp = 2

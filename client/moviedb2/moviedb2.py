@@ -47,12 +47,15 @@ def load_config ( filename ):
 
 def send_filename_to_server ( filename ):
     try:
-        r = requests.post(CONFIG["POST_SERVER_URL"], json={"file_name": filename})
+        r = requests.post(CONFIG["POST_SERVER_URL"], json={"filename": filename})
         if r.status_code == 200:
-            return True
-        return False
+            return (True, None)
+        elif r.status_code == 400:
+            content = r.json()
+            return (False, content["code"])
+        return (False, 0)
     except (ConnectionRefusedError, requests.exceptions.ConnectionError, urllib3.exceptions.MaxRetryError, urllib3.exceptions.NewConnectionError) :
-        return False
+        return (False, 0)
 
 def get_files_without_id( files ):
     return [ f for f in files if not re.search('\{tt\d{7}\}', f) ]
@@ -77,8 +80,12 @@ def monitor_folder ( path, movie_data_path ):
             if is_new_movie ( filename ):
                 folder_stats["found"] += 1
                 add_new_movie ( filename )
-            if send_filename_to_server( filename ):
+            r = send_filename_to_server( filename )
+            if r[0]:
                 set_movie_sent( filename )
                 folder_stats["sent"] += 1
+            else:
+                if r[1] == 1:
+                    set_movie_sent( filename )
     write_movie_data (movie_data_path)
     return folder_stats
