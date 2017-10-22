@@ -4,3 +4,5 @@ __pycache__/
 client/tests/movies_folder/
 config.yml
 movie_data.json
+.coverage
+cover/
