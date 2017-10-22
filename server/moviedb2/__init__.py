@@ -1,3 +1,1 @@
-from .moviedb2 import app
-
-
+from .moviedb2 import *

@@ -1,11 +1,10 @@
-import moviedb2
 import unittest
 import json
+from nose.tools import assert_equals
+
+import moviedb2
 
 class Moviedb2TestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.app = moviedb2.app.test_client()
 
     def test_hello_world(self):
         rv = self.app.get('/')
@@ -18,3 +17,12 @@ class Moviedb2TestCase(unittest.TestCase):
                            data=json.dumps(data),
                            content_type='application/json')
         assert rv.status_code == 200
+        assert_equals(self.db.movie_filenames.count(), 1)
+
+    def setUp(self):
+        self.app = moviedb2.app.test_client()
+        moviedb2.app.config.from_object('config.TestingConfig')
+        self.db = moviedb2.connect_db(moviedb2.app)
+
+    def tearDown(self):
+        self.db.drop_collection("movie_filenames")
