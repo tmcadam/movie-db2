@@ -6,18 +6,34 @@ import moviedb2
 
 class Moviedb2TestCase(unittest.TestCase):
 
-    def test_hello_world(self):
-        rv = self.app.get('/')
+    def test_get_movies(self):
+        rv = self.app.get('/moviesdb2/filenames')
         assert rv.status_code == 200
-        assert b'Hello, World!' in rv.data
 
-    def test_can_post_new_filename(self):
-        data = {"filename": "somefilename"}
+    def test_can_post_new_filename_if_new(self):
+        data = {"filename": "test.avi"}
         rv = self.app.post('/moviesdb2/api/v1.0/filenames',
                            data=json.dumps(data),
                            content_type='application/json')
-        assert rv.status_code == 200
-        assert_equals(self.db.movie_filenames.count(), 1)
+        assert_equals(rv.status_code, 200)
+        assert_equals(self.db.movie_names.count(), 1)
+
+    def test_returns_400_if_filename_already_in_db(self):
+        data = {"filename": "test.avi"}
+        rv = self.app.post('/moviesdb2/api/v1.0/filenames',
+                           data=json.dumps(data),
+                           content_type='application/json')
+        assert_equals(rv.status_code, 200)
+        assert_equals(self.db.movie_names.count(), 1)
+
+        rv = self.app.post('/moviesdb2/api/v1.0/filenames',
+                           data=json.dumps(data),
+                           content_type='application/json')
+        assert_equals(rv.status_code, 400)
+        assert_equals(self.db.movie_names.count(), 1)
+
+    def test_setUp_sets_the_right_database_for_tests(self):
+        assert_equals(self.db.name, "movies-test")
 
     def setUp(self):
         self.app = moviedb2.app.test_client()
@@ -25,4 +41,4 @@ class Moviedb2TestCase(unittest.TestCase):
         self.db = moviedb2.connect_db(moviedb2.app)
 
     def tearDown(self):
-        self.db.drop_collection("movie_filenames")
+        self.db.drop_collection("movie_names")
