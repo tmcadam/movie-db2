@@ -11,50 +11,6 @@ POST_SERVER_URL = "http://localhost:5000/moviesdb2/api/v1.0/filenames"
 
 class Moviedb2TestCase(unittest.TestCase):
 
-    # an integration test of every other function
-    def test_monitor_folder_responds_to_new_files_in_folder(self):
-        self.tearDown()
-        os.mkdir(self.test_folder)
-        with requests_mock.mock() as m:
-            # empty folder
-            m.post(POST_SERVER_URL, status_code=200)
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 0)
-            assert_equals(folder_stats["found"], 0)
-            assert_equals(folder_stats["count"], 0)
-            # 2 files added but the server is not accepting the files being sent
-            m.post(POST_SERVER_URL, status_code=404)
-            Path(os.path.join(self.test_folder, "movie1.avi")).touch()
-            Path(os.path.join(self.test_folder, "movie2.avi")).touch()
-            m.post(POST_SERVER_URL, status_code=404)
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 0)
-            assert_equals(folder_stats["found"], 2)
-            assert_equals(folder_stats["count"], 2)
-            # after another run the 2 files aren't classed as newly found
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 0)
-            assert_equals(folder_stats["found"], 0)
-            assert_equals(folder_stats["count"], 2)
-            # server is accepting the files
-            m.post(POST_SERVER_URL, status_code=200)
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 2)
-            assert_equals(folder_stats["found"], 0)
-            assert_equals(folder_stats["count"], 2)
-            # add a third file while the server is up
-            Path(os.path.join(self.test_folder, "movie3.avi")).touch()
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 1)
-            assert_equals(folder_stats["found"], 1)
-            assert_equals(folder_stats["count"], 3)
-            # after another run the news and sents should disappear
-            Path(os.path.join(self.test_folder, "movie3.avi")).touch()
-            folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
-            assert_equals(folder_stats["sent"], 0)
-            assert_equals(folder_stats["found"], 0)
-            assert_equals(folder_stats["count"], 3)
-
     def test_can_write_movie_data_to_file(self):
         moviedb2.load_movie_data( self.movie_data_path )
         moviedb2.add_new_movie( "filename4" )
@@ -106,11 +62,10 @@ class Moviedb2TestCase(unittest.TestCase):
         assert "POST_SERVER_URL" in config and config["POST_SERVER_URL"] == "http://test-url.com"
         assert "FILE_EXTS" in config and len(config["FILE_EXTS"]) == 3 and config["FILE_EXTS"][0] == ".avi"
 
-
     def test_send_filename_returns_true_if_successful(self):
         with requests_mock.mock() as m:
             m.post(POST_SERVER_URL, status_code=200)
-            assert moviedb2.send_filename_to_server('some_file_name')
+            assert moviedb2.send_filename_to_server('some_file_name')[0]
 
     def test_send_filename_returns_false_if_unsuccessful(self):
         with requests_mock.mock() as m:
