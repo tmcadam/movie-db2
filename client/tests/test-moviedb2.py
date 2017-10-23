@@ -11,6 +11,11 @@ POST_SERVER_URL = "http://localhost:5000/moviesdb2/api/v1.0/filenames"
 
 class Moviedb2TestCase(unittest.TestCase):
 
+    def test_get_checksum_1mb_returns_checksum(self):
+        checksum_file = os.path.join('tests','data','checksum-test.avi')
+        expected_checksum = "3e9c3a8b73eab486bda7330cff4e0195" # calced using md5sum program in Ubuntu
+        assert_equals( moviedb2.get_1mb_checksum(checksum_file), expected_checksum )
+
     def test_can_write_movie_data_to_file(self):
         moviedb2.load_movie_data( self.movie_data_path )
         moviedb2.add_new_movie( "filename4" )

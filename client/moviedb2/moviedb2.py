@@ -3,11 +3,17 @@ import re
 import urllib3
 import yaml
 import json
+import hashlib
 
 import requests
 
 CONFIG = None
 MOVIE_DATA = None
+
+def get_1mb_checksum( filename ):
+    with open(filename, 'rb') as f:
+        md5 = hashlib.md5(f.read(1048576))
+    return md5.hexdigest()
 
 def write_movie_data( filename ):
     with open(filename, 'w') as f:
