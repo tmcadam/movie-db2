@@ -23,8 +23,8 @@ class Moviedb2IntegrationTestCase(unittest.TestCase):
             assert_equals(folder_stats["count"], 0)
             # 2 files added but the server is not accepting the files being sent
             m.post(POST_SERVER_URL, status_code=404)
-            Path(os.path.join(self.test_folder, "movie1.avi")).touch()
-            Path(os.path.join(self.test_folder, "movie2.avi")).touch()
+            self.make_file(os.path.join(self.test_folder, "movie1.avi"))
+            self.make_file(os.path.join(self.test_folder, "movie2.avi"))
             m.post(POST_SERVER_URL, status_code=404)
             folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
             assert_equals(folder_stats["sent"], 0)
@@ -42,17 +42,20 @@ class Moviedb2IntegrationTestCase(unittest.TestCase):
             assert_equals(folder_stats["found"], 0)
             assert_equals(folder_stats["count"], 2)
             # add a third file while the server is up
-            Path(os.path.join(self.test_folder, "movie3.avi")).touch()
+            self.make_file(os.path.join(self.test_folder, "movie3.avi"))
             folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
             assert_equals(folder_stats["sent"], 1)
             assert_equals(folder_stats["found"], 1)
             assert_equals(folder_stats["count"], 3)
             # after another run the news and sents should disappear
-            Path(os.path.join(self.test_folder, "movie3.avi")).touch()
             folder_stats = moviedb2.monitor_folder(self.test_folder, self.tmp_movie_data_path)
             assert_equals(folder_stats["sent"], 0)
             assert_equals(folder_stats["found"], 0)
             assert_equals(folder_stats["count"], 3)
+
+    def make_file(self, filename):
+        with open(filename, 'wb') as f:
+            f.write(os.urandom(2097152)) #2mb
 
     def setUp(self):
         self.test_folder = os.path.join("tests", "data" "test_movies")
