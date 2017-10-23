@@ -3,7 +3,7 @@ from flask import Flask, request, render_template
 from .database_helpers import connect_db, insert_timestamped_doc
 
 app = Flask(__name__)
-app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.TestingConfig')
 
 @app.route('/')
 def hello_world():
@@ -14,7 +14,6 @@ def post_movies():
     db = connect_db(app)
     content = request.get_json()
     content["status"] = "new"
-    print (content["filename"])
     if insert_timestamped_doc(db.movie_names, content):
         # run some new movie process
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}

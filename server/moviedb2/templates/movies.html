@@ -6,7 +6,7 @@
   <h1>Movies</h1>
   <ul>
   {% for movie in movies %}
-    <li>{{ movie.filename }}</li>
+    <li>{{ movie.filename }}<br>{{ movie.hash }}</li>
   {% endfor %}
   </ul>
 </body>

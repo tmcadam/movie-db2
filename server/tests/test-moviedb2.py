@@ -3,6 +3,7 @@ import json
 from nose.tools import assert_equals
 
 import moviedb2
+from moviedb2.database_helpers import drop_db, insert_timestamped_doc
 
 class Moviedb2TestCase(unittest.TestCase):
 
@@ -10,16 +11,17 @@ class Moviedb2TestCase(unittest.TestCase):
         rv = self.app.get('/moviesdb2/filenames')
         assert rv.status_code == 200
 
-    def test_can_post_new_filename_if_new(self):
-        data = {"filename": "test.avi"}
+    def test_can_post_new_hash_if_new(self):
+        data = {"hash": "hash1", "filename": "test.avi"}
         rv = self.app.post('/moviesdb2/api/v1.0/filenames',
                            data=json.dumps(data),
                            content_type='application/json')
         assert_equals(rv.status_code, 200)
         assert_equals(self.db.movie_names.count(), 1)
 
-    def test_returns_400_if_filename_already_in_db(self):
-        data = {"filename": "test.avi"}
+    def test_returns_400_if_hash_already_in_db(self):
+        #insert_timestamped_doc(self.db.movie_names, data)
+        data = {"hash": "hash1", "filename": "test.avi"}
         rv = self.app.post('/moviesdb2/api/v1.0/filenames',
                            data=json.dumps(data),
                            content_type='application/json')
@@ -41,4 +43,4 @@ class Moviedb2TestCase(unittest.TestCase):
         self.db = moviedb2.connect_db(moviedb2.app)
 
     def tearDown(self):
-        self.db.drop_collection("movie_names")
+        drop_db(moviedb2.app, "movies-test")
