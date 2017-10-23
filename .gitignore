@@ -7,3 +7,4 @@ movie_data.json
 .coverage
 cover/
 *.log
+*.out
