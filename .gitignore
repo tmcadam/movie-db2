@@ -6,3 +6,4 @@ config.yml
 movie_data.json
 .coverage
 cover/
+*.log

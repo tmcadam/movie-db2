@@ -5,12 +5,5 @@ source .env/bin/activate
 export PYTHONPATH=${PYTHONPATH}:${PROJECT_DIR}/moviedb2
 export FLASK_APP=moviedb2
 export FLASK_DEBUG=true
-
-# Start server
-COMMAND="flask run"
-nohup $COMMAND &>>"${PROJECT_DIR}/server.log"&
-sleep 1s
-PID=$(pgrep -n python3.5)
-echo "  **>server pid: ${PID}"
-echo $PID>"${1}/server.pid"
+nosetests
 deactivate
