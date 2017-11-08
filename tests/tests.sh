@@ -3,12 +3,13 @@ PROJECT_DIR="$( cd "$(  dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 cd "${PROJECT_DIR}"
 
 echo "**> client tests"
-#bash client/run-tests.sh
+bash client/run-tests.sh
 
 echo "**> server tests"
-#bash server/run-tests.sh
+bash server/run-tests.sh
 
 echo "**> integration tests"
+sudo service mongod restart
 mkdir -p "${PROJECT_DIR}/tests/movies-folder"
 
 PID_FOLDER="/tmp/moviedb"

@@ -5,5 +5,6 @@ source .env/bin/activate
 export PYTHONPATH=${PYTHONPATH}:${PROJECT_DIR}/moviedb2
 export FLASK_APP=moviedb2
 export FLASK_DEBUG=true
+sudo service mongod restart
 nosetests
 deactivate
