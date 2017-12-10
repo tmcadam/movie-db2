@@ -21,7 +21,6 @@ kill -9 `cat ${PID_FOLDER}/client.pid`> /dev/null 2>&1
 kill -9 `cat ${PID_FOLDER}/server.pid`> /dev/null 2>&1
 
 # start server
-sudo service mongod restart
 bash server/run.sh "${PID_FOLDER}"
 # start client
 bash client/run.sh "${PID_FOLDER}"

@@ -7,6 +7,7 @@ export FLASK_APP=moviedb2
 export FLASK_DEBUG=true
 
 # Start server
+sudo service mongod restart
 COMMAND="flask run"
 nohup $COMMAND &>>"${PROJECT_DIR}/server.log"&
 sleep 1s
