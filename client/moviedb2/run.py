@@ -17,4 +17,4 @@ while 1:
                                                             datetime.datetime.now()))
   else:
       print("{0} :-> Error".format(datetime.datetime.now()))
-  time.sleep (10)
+  time.sleep (moviedb2.CONFIG["SLEEP_SECS"])
