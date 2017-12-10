@@ -2,6 +2,8 @@
 __pycache__/
 .idea/
 client/tests/movies_folder/
+tests/movies-folder
+tests/phantomjs
 config.yml
 movie_data.json
 .coverage
